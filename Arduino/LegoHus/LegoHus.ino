@@ -23,13 +23,14 @@ const uint8_t LED7 = 10; // GPIO10, used for module SPI flash?
 #define WLAN_SSID       "Simpsons"
 #define WLAN_PASS       "6DskwPNYqtkm4V"
 
+WiFiClientSecure client;
+
 /************************* Adafruit.io Setup *********************************/
 #define AIO_SERVER      "io.adafruit.com"
 #define AIO_SERVERPORT  8883
 #define AIO_USERNAME    "Tompa21"
 #define AIO_KEY         "df7dbaf71dd98c09cf64115c672d252c687045b3"
 
-WiFiClientSecure client;
 Adafruit_MQTT_Client mqtt(&client, AIO_SERVER, AIO_SERVERPORT, AIO_USERNAME, AIO_USERNAME, AIO_KEY);
 
 Adafruit_MQTT_Subscribe timeFeed = Adafruit_MQTT_Subscribe(&mqtt, "time/seconds");
@@ -44,15 +45,13 @@ Adafruit_MQTT_Publish led7ValuePub = Adafruit_MQTT_Publish(&mqtt, LED7_VALUE_FEE
 
 const char WILL_FEED[] PROGMEM = AIO_USERNAME "/feeds/disconnect";
 
-/*************************** Error Reporting *********************************/
-
 const char ERROR_FEED[] PROGMEM = AIO_USERNAME "/errors";
 Adafruit_MQTT_Subscribe errors = Adafruit_MQTT_Subscribe(&mqtt, ERROR_FEED);
 
 const char THROTTLE_FEED[] PROGMEM = AIO_USERNAME "/throttle";
 Adafruit_MQTT_Subscribe throttle = Adafruit_MQTT_Subscribe(&mqtt, THROTTLE_FEED);
 
-
+/************************* Global variables *********************************/
 typedef enum {
     STATE_NONE,
     STATE_SUN_UP,
@@ -62,7 +61,9 @@ typedef enum {
 state_t currentState = STATE_NONE;
 
 
-
+/**
+ * 
+ */
 void timeCallback(uint32_t timeNow) {
 
     Serial.println(timeNow);
